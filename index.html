@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Quotes from my reading</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F2F3F5;
+    --surface: #FFFFFF;
+    --field: #F7F8F9;
+    --text: #16181D;
+    --muted: #5B6270;
+    --line: #D9DCE2;
+    --ink: #16181D;
+    --on-ink: #FFFFFF;
+    --focus: #3B5BDB;
+    --serif: "Newsreader", Georgia, "Times New Roman", serif;
+    --sans: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color-scheme: light;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121316;
+      --surface: #1A1C21;
+      --field: #121316;
+      --text: #ECEDEF;
+      --muted: #A0A6B2;
+      --line: #2E323A;
+      --ink: #ECEDEF;
+      --on-ink: #121316;
+      --focus: #8DA2FF;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121316;
+    --surface: #1A1C21;
+    --field: #121316;
+    --text: #ECEDEF;
+    --muted: #A0A6B2;
+    --line: #2E323A;
+    --ink: #ECEDEF;
+    --on-ink: #121316;
+    --focus: #8DA2FF;
+    color-scheme: dark;
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .visually-hidden {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  .page { max-width: 1080px; margin: 0 auto; padding: 1.75rem clamp(1rem, 4vw, 2rem) 4rem; }
+
+  .top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .25rem 1.5rem; }
+  h1 {
+    margin: 0;
+    font: 600 clamp(1.7rem, 4.5vw, 2.4rem)/1.1 var(--serif);
+    letter-spacing: -0.01em;
+  }
+  .count { margin: 0; color: var(--muted); font-size: .95rem; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 1.75rem; margin: 1.25rem 0 1.5rem; border-bottom: 1px solid var(--line); }
+  .tab {
+    appearance: none; background: none; border: 0; cursor: pointer;
+    padding: .7rem 0; margin-bottom: -1px;
+    font: 500 1rem var(--sans); color: var(--muted);
+    border-bottom: 2px solid transparent;
+  }
+  .tab[aria-selected="true"] { color: var(--text); border-bottom-color: var(--text); font-weight: 600; }
+  .tab:hover { color: var(--text); }
+
+  /* Buttons */
+  .btn {
+    appearance: none; cursor: pointer;
+    font: 600 .95rem var(--sans);
+    padding: .65rem 1.15rem; border-radius: 6px; border: 1px solid transparent;
+    min-height: 44px;
+  }
+  .btn.primary { background: var(--ink); color: var(--on-ink); }
+  .btn.ghost { background: transparent; color: var(--text); border-color: var(--line); }
+  .btn:disabled { opacity: .6; cursor: default; }
+
+  /* Composer */
+  .composer {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    padding: 1.1rem 1.1rem 1rem; margin-bottom: 1.75rem;
+  }
+  .composer h2 { margin: 0 0 .75rem; font: 600 1.05rem var(--sans); }
+  .field label { display: block; margin-bottom: .3rem; font-size: .85rem; font-weight: 500; color: var(--muted); }
+  .field input, .field textarea {
+    width: 100%; background: var(--field); color: var(--text);
+    border: 1px solid var(--line); border-radius: 6px; padding: .6rem .7rem;
+    font: 400 1rem var(--sans);
+  }
+  .field textarea { font: 400 1.1rem/1.45 var(--serif); min-height: 96px; resize: vertical; }
+  .field input::placeholder, .field textarea::placeholder { color: var(--muted); }
+  .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .75rem; margin-top: .75rem; }
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; margin-top: .9rem; }
+  .multi { display: inline-flex; align-items: center; gap: .45rem; font-size: .9rem; color: var(--muted); cursor: pointer; }
+  .multi input { width: 1.05rem; height: 1.05rem; accent-color: var(--ink); }
+  .hint { margin-left: auto; font-size: .85rem; color: var(--muted); }
+  .form-msg { flex-basis: 100%; margin: 0; font-size: .9rem; color: #B42318; min-height: 0; }
+  .form-msg:empty { display: none; }
+  :root[data-theme="dark"] .form-msg { color: #FDA29B; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .form-msg { color: #FDA29B; } }
+  .adminbar {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem 1rem;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    padding: .8rem 1rem; margin-top: 1.1rem;
+  }
+  .adminbar p { margin: 0; font-size: .95rem; flex: 1 1 260px; }
+  .admin-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+
+  /* Wall */
+  .wall-head { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1rem; margin-bottom: 1rem; }
+  .search {
+    flex: 1 1 220px; max-width: 360px; background: var(--surface); color: var(--text);
+    border: 1px solid var(--line); border-radius: 6px; padding: .55rem .7rem; font: 400 .95rem var(--sans);
+  }
+  .status { margin: 0; color: var(--muted); }
+  .wall { column-width: 250px; column-gap: 1rem; }
+
+  .card {
+    --card-bg: #1F3A93; --card-fg: #F3F5FF;
+    display: block; position: relative;
+    background: var(--card-bg); color: var(--card-fg);
+    border-radius: 6px;
+    padding: 1.1rem 1.1rem .6rem 1.6rem;
+    margin: 0 0 1rem; break-inside: avoid;
+    box-shadow: inset 7px 0 0 rgba(0, 0, 0, .14), inset 8px 0 0 rgba(255, 255, 255, .16);
+  }
+  .card.editing { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .card-text {
+    margin: 0 0 .9rem; font: 400 1.18rem/1.42 var(--serif);
+    white-space: pre-line; overflow-wrap: anywhere; text-wrap: pretty;
+  }
+  .card-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: .5rem; }
+  .src { display: flex; flex-direction: column; min-width: 0; padding-bottom: .5rem; font-size: .85rem; line-height: 1.3; }
+  .src cite { font-style: normal; font-weight: 600; overflow-wrap: anywhere; }
+  .src span { overflow-wrap: anywhere; }
+  .tools { display: flex; flex-shrink: 0; gap: 2px; margin-right: -.4rem; }
+  .icon {
+    appearance: none; background: none; border: 0; cursor: pointer; color: inherit;
+    width: 36px; height: 36px; border-radius: 6px; display: grid; place-items: center;
+  }
+  .icon:hover { background: color-mix(in srgb, currentColor 16%, transparent); }
+  .icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .card :focus-visible, .cover :focus-visible { outline-color: currentColor; }
+  .confirm {
+    appearance: none; background: none; cursor: pointer; color: inherit;
+    border: 1.5px solid currentColor; border-radius: 6px; padding: 0 .6rem; height: 36px;
+    font: 600 .85rem var(--sans);
+  }
+
+  /* Random quote */
+  .cover {
+    --card-bg: #1F3A93; --card-fg: #F3F5FF;
+    margin: 0; position: relative;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 2rem;
+    min-height: min(62vh, 480px);
+    padding: clamp(1.75rem, 5vw, 3.5rem) clamp(1.75rem, 6vw, 4rem) clamp(1.5rem, 4vw, 2.5rem) clamp(2.25rem, 7vw, 4.5rem);
+    background: var(--card-bg); color: var(--card-fg);
+    border-radius: 6px;
+    box-shadow: inset 14px 0 0 rgba(0, 0, 0, .14), inset 16px 0 0 rgba(255, 255, 255, .16);
+    transition: background-color .4s ease, color .4s ease;
+  }
+  .cover blockquote {
+    margin: 0; font: 400 clamp(1.5rem, 4.2vw, 2.6rem)/1.25 var(--serif);
+    white-space: pre-line; overflow-wrap: anywhere; text-wrap: pretty;
+  }
+  .cover blockquote::before { content: "\201C"; }
+  .cover blockquote::after { content: "\201D"; }
+  .cover blockquote.long { font-size: clamp(1.2rem, 2.8vw, 1.75rem); line-height: 1.35; }
+  .cover blockquote.xlong { font-size: clamp(1.05rem, 2.2vw, 1.3rem); line-height: 1.45; }
+  .cover figcaption { display: flex; flex-direction: column; font-size: 1rem; line-height: 1.35; }
+  .cover cite { font-style: normal; font-weight: 600; font-size: 1.1rem; }
+  .random-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1rem; }
+
+  .empty { padding: 2rem 0; }
+  .empty p { margin: 0 0 1rem; color: var(--muted); font-size: 1.05rem; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+    transform: translate(-50%, 16px); opacity: 0; pointer-events: none;
+    background: var(--ink); color: var(--on-ink);
+    padding: .6rem 1rem; border-radius: 6px; font-size: .92rem; max-width: calc(100vw - 2rem);
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="top">
+    <h1>Quotes from my reading</h1>
+    <p class="count" id="count"></p>
+  </header>
+
+  <div class="adminbar" id="adminBar" hidden>
+    <p id="adminMsg"></p>
+    <div class="admin-actions">
+      <button type="button" class="btn primary" id="dlBtn">Download quotes.js</button>
+      <button type="button" class="btn ghost" id="resetBtn">Discard my changes</button>
+    </div>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Sections">
+    <button class="tab" role="tab" id="tab-fav" aria-selected="true" aria-controls="panel-fav">Favourite quotes</button>
+    <button class="tab" role="tab" id="tab-rand" aria-selected="false" aria-controls="panel-rand" tabindex="-1">Random quote</button>
+  </div>
+
+  <!-- Section 1: Favourite quotes -->
+  <section id="panel-fav" role="tabpanel" aria-labelledby="tab-fav">
+    <form id="addForm" class="composer" autocomplete="off">
+      <h2 id="formTitle">Add a quote</h2>
+      <div class="field">
+        <label for="qText">Quote</label>
+        <textarea id="qText" maxlength="3000" placeholder="Type or paste a line you loved"></textarea>
+      </div>
+      <div class="fields">
+        <div class="field">
+          <label for="qBook">Book</label>
+          <input id="qBook" type="text" maxlength="200" list="bookList" placeholder="Book title">
+          <datalist id="bookList"></datalist>
+        </div>
+        <div class="field">
+          <label for="qAuthor">Author</label>
+          <input id="qAuthor" type="text" maxlength="200" placeholder="Author">
+        </div>
+      </div>
+      <div class="actions">
+        <button type="submit" class="btn primary" id="submitBtn">Add quote</button>
+        <button type="button" class="btn ghost" id="cancelEdit" hidden>Cancel</button>
+        <label class="multi" id="multiWrap"><input type="checkbox" id="qMulti"> Several quotes at once (separate with a blank line)</label>
+        <span class="hint">Ctrl or ⌘ + Enter adds it. Book and author stay filled for the next one.</span>
+        <p class="form-msg" id="formMsg" role="alert"></p>
+      </div>
+    </form>
+
+    <div class="wall-head">
+      <input class="search" id="search" type="search" placeholder="Search by quote, book or author" aria-label="Search quotes" hidden>
+      <p class="status" id="listStatus"></p>
+    </div>
+    <div class="wall" id="wall"></div>
+  </section>
+
+  <!-- Section 2: Random quote -->
+  <section id="panel-rand" role="tabpanel" aria-labelledby="tab-rand" hidden>
+    <div class="empty" id="randomEmpty" hidden>
+      <p id="randomEmptyMsg">Save a few quotes first, then come back here for a surprise.</p>
+      <button type="button" class="btn primary" id="goAdd">Add a quote</button>
+    </div>
+    <figure class="cover" id="randomCard" aria-live="polite" hidden>
+      <blockquote id="randomText"></blockquote>
+      <figcaption>
+        <cite id="randomBook"></cite>
+        <span id="randomAuthor"></span>
+      </figcaption>
+    </figure>
+    <div class="random-actions" id="randomActions" hidden>
+      <button type="button" class="btn primary" id="nextBtn">Another quote</button>
+      <button type="button" class="btn ghost" id="randomCopy">Copy</button>
+    </div>
+  </section>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="quotes.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  // Card colours: background + readable text colour for each.
+  const PALETTE = [
+    { bg: '#1F3A93', fg: '#F3F5FF' }, // ink blue
+    { bg: '#F2B705', fg: '#2B2100' }, // mustard
+    { bg: '#9BD3AE', fg: '#10321F' }, // mint
+    { bg: '#F28B82', fg: '#3B0D0A' }, // coral
+    { bg: '#8EC5FC', fg: '#0B2A4A' }, // sky
+    { bg: '#B8A9F0', fg: '#251A5A' }, // lavender
+    { bg: '#1F6F50', fg: '#EAF7EF' }, // forest
+    { bg: '#7B2D5B', fg: '#FBE9F3' }, // plum
+    { bg: '#FF8A3D', fg: '#3A1600' }, // tangerine
+    { bg: '#0B7274', fg: '#E6FBFB' }, // teal
+    { bg: '#C7E36B', fg: '#23300A' }, // lime
+    { bg: '#C2334D', fg: '#FFEDEF' }  // berry
+  ];
+  const ICONS = {
+    copy: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>',
+    color: '<path d="M20 11a8 8 0 0 0-14.9-3M4 5v3h3"/><path d="M4 13a8 8 0 0 0 14.9 3M20 19v-3h-3"/>',
+    edit: '<path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/>',
+    trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/>'
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const LS_KEY = 'book-quotes-owner-v1';
+  const ADMIN_KEY = 'book-quotes-owner-mode';
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---- State ----
+  let quotes = [];          // {id, text, book, author, color, createdAt}
+  let ready = false;
+  let readOnly = true;      // visitors read; only owner mode can change quotes
+  let published = [];       // what quotes.js on the site currently contains
+  let editingId = null;
+  let draft = null;         // what was typed in the form before starting an edit
+  let confirmId = null;
+  let confirmTimer = null;
+  let query = '';
+  let randomId = null;
+  let lastColor = -1;
+  let busy = false;
+  let toastTimer = null;
+
+  // ---- Small helpers ----
+  const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
+  function uid() {
+    try { if (window.crypto && crypto.randomUUID) return crypto.randomUUID(); } catch (e) {}
+    return 'q' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+  function pickColor(avoid) {
+    let i;
+    do { i = Math.floor(Math.random() * PALETTE.length); } while (i === avoid && PALETTE.length > 1);
+    return i;
+  }
+  function colorOf(q) {
+    const n = Number.isInteger(q.color) ? q.color : 0;
+    return PALETTE[((n % PALETTE.length) + PALETTE.length) % PALETTE.length];
+  }
+  function clean(q) {
+    return {
+      id: q.id,
+      text: String(q.text || ''),
+      book: String(q.book || ''),
+      author: String(q.author || ''),
+      color: q.color,
+      createdAt: Number(q.createdAt) || 0
+    };
+  }
+  function toast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+  async function copyText(t) {
+    try { await navigator.clipboard.writeText(t); return true; } catch (e) {}
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = t; ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand('copy');
+      ta.remove();
+      return ok;
+    } catch (e) { return false; }
+  }
+  async function copyQuote(q) {
+    const who = [q.book, q.author].filter(Boolean).join(', ');
+    const ok = await copyText('\u201C' + q.text + '\u201D' + (who ? ' \u2014 ' + who : ''));
+    toast(ok ? 'Copied' : 'Couldn\u2019t copy. Select the text and copy it manually.');
+  }
+
+  // ---- Owner mode: switch on with ?admin at the end of the address, off with ?admin=off ----
+  function isOwnerMode() {
+    try {
+      const p = new URLSearchParams(location.search).get('admin');
+      if (p === 'off') { localStorage.removeItem(ADMIN_KEY); return false; }
+      if (p !== null) { localStorage.setItem(ADMIN_KEY, '1'); return true; }
+      return localStorage.getItem(ADMIN_KEY) === '1';
+    } catch (e) { return false; }
+  }
+  const normalize = (arr) => JSON.stringify(
+    arr.slice().sort((x, y) => (x.id < y.id ? -1 : x.id > y.id ? 1 : 0))
+      .map((q) => [q.id, q.text, q.book, q.author, q.color, q.createdAt])
+  );
+  const isDirty = () => normalize(quotes) !== normalize(published);
+  function loadDraft() {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      const arr = raw ? JSON.parse(raw) : null;
+      return Array.isArray(arr) ? arr.filter((q) => q && typeof q.text === 'string' && q.id).map(clean) : null;
+    } catch (e) { return null; }
+  }
+  function saveDraft() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(quotes)); }
+    catch (e) { throw new Error('storage'); }
+  }
+
+  // ---- Storage actions (they change the owner's copy in this browser) ----
+  async function addQuote(data) { quotes.push(Object.assign({ id: uid() }, data)); saveDraft(); }
+  async function updateQuote(id, patch) {
+    const q = quotes.find((x) => x.id === id);
+    if (q) Object.assign(q, patch);
+    saveDraft();
+  }
+  async function deleteQuote(id) { quotes = quotes.filter((x) => x.id !== id); saveDraft(); }
+  function writeFailed() { toast('Couldn\u2019t save in this browser. Check that storage isn\u2019t blocked.'); }
+
+  function downloadQuotes() {
+    const data = quotes.slice().sort((x, y) => y.createdAt - x.createdAt)
+      .map((q) => ({ id: q.id, text: q.text, book: q.book, author: q.author, color: q.color, createdAt: q.createdAt }));
+    const body = 'window.QUOTES = ' + JSON.stringify(data, null, 2) + ';\n';
+    const url = URL.createObjectURL(new Blob([body], { type: 'text/javascript' }));
+    const a = document.createElement('a');
+    a.href = url; a.download = 'quotes.js';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast('Downloaded. Replace quotes.js in your project, then redeploy.');
+  }
+
+  // ---- Rendering ----
+  function render() {
+    renderCount();
+    renderBooks();
+    renderFormState();
+    renderList();
+    renderRandom();
+  }
+
+  function renderCount() {
+    const el = $('count');
+    if (!ready || !quotes.length) { el.textContent = ''; return; }
+    const books = new Set(quotes.map((q) => q.book.trim().toLowerCase()).filter(Boolean));
+    el.textContent = plural(quotes.length, 'quote') + (books.size ? ' from ' + plural(books.size, 'book') : '');
+  }
+
+  function renderBooks() {
+    const dl = $('bookList');
+    dl.textContent = '';
+    const seen = new Map();
+    quotes.forEach((q) => {
+      const b = q.book.trim();
+      if (b && !seen.has(b.toLowerCase())) seen.set(b.toLowerCase(), b);
+    });
+    Array.from(seen.values()).sort((a, b) => a.localeCompare(b)).forEach((b) => {
+      const o = document.createElement('option');
+      o.value = b;
+      dl.appendChild(o);
+    });
+  }
+
+  function renderFormState() {
+    const editing = !!editingId;
+    $('addForm').hidden = readOnly;
+    renderAdmin();
+    $('formTitle').textContent = editing ? 'Edit quote' : 'Add a quote';
+    $('submitBtn').textContent = editing ? 'Save changes' : 'Add quote';
+    $('cancelEdit').hidden = !editing;
+    $('multiWrap').hidden = editing;
+  }
+
+  function renderAdmin() {
+    const bar = $('adminBar');
+    bar.hidden = readOnly;
+    if (readOnly) return;
+    const dirty = isDirty();
+    $('adminMsg').textContent = dirty
+      ? 'Owner mode. You have changes that aren\u2019t on your site yet. Download quotes.js, replace it in your project and redeploy.'
+      : 'Owner mode. Your site shows all of your quotes.';
+    $('dlBtn').className = 'btn ' + (dirty ? 'primary' : 'ghost');
+    $('resetBtn').hidden = !dirty;
+  }
+
+  function iconBtn(name, label, onClick) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'icon';
+    b.setAttribute('aria-label', label);
+    b.title = label;
+    b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS[name] + '</svg>';
+    b.addEventListener('click', onClick);
+    return b;
+  }
+
+  function cardEl(q) {
+    const c = colorOf(q);
+    const el = document.createElement('article');
+    el.className = 'card' + (q.id === editingId ? ' editing' : '');
+    el.style.setProperty('--card-bg', c.bg);
+    el.style.setProperty('--card-fg', c.fg);
+
+    const text = document.createElement('blockquote');
+    text.className = 'card-text';
+    text.textContent = q.text;
+    el.appendChild(text);
+
+    const foot = document.createElement('footer');
+    foot.className = 'card-foot';
+    const src = document.createElement('div');
+    src.className = 'src';
+    if (q.book) { const b = document.createElement('cite'); b.textContent = q.book; src.appendChild(b); }
+    if (q.author) { const a = document.createElement('span'); a.textContent = q.author; src.appendChild(a); }
+    foot.appendChild(src);
+
+    const tools = document.createElement('div');
+    tools.className = 'tools';
+    tools.appendChild(iconBtn('copy', 'Copy quote', () => copyQuote(q)));
+    if (!readOnly) {
+      tools.appendChild(iconBtn('color', 'Change colour', async () => {
+        try { await updateQuote(q.id, { color: pickColor(q.color) }); render(); } catch (e) { writeFailed(e); }
+      }));
+      tools.appendChild(iconBtn('edit', 'Edit quote', () => startEdit(q)));
+      if (confirmId === q.id) {
+        const y = document.createElement('button');
+        y.type = 'button';
+        y.className = 'confirm';
+        y.textContent = 'Delete?';
+        y.setAttribute('data-autofocus', '1');
+        y.addEventListener('click', async () => {
+          clearTimeout(confirmTimer); confirmId = null;
+          try {
+            if (editingId === q.id) stopEdit();
+            await deleteQuote(q.id);
+            render();
+            toast('Quote deleted');
+          } catch (e) { writeFailed(e); }
+        });
+        tools.appendChild(y);
+      } else {
+        tools.appendChild(iconBtn('trash', 'Delete quote', () => {
+          confirmId = q.id;
+          clearTimeout(confirmTimer);
+          confirmTimer = setTimeout(() => { confirmId = null; renderList(); }, 3500);
+          renderList();
+        }));
+      }
+    }
+    foot.appendChild(tools);
+    el.appendChild(foot);
+    return el;
+  }
+
+  function renderList() {
+    const wall = $('wall');
+    const status = $('listStatus');
+    wall.textContent = '';
+    $('search').hidden = !ready || !quotes.length;
+    if (!ready) { status.textContent = 'Loading your quotes\u2026'; return; }
+
+    const s = query.trim().toLowerCase();
+    const sorted = quotes.slice().sort((a, b) => b.createdAt - a.createdAt);
+    const shown = s
+      ? sorted.filter((q) => (q.text + ' ' + q.book + ' ' + q.author).toLowerCase().includes(s))
+      : sorted;
+
+    if (!quotes.length) status.textContent = readOnly ? 'No quotes have been added yet.' : 'No quotes yet. Type your first one above.';
+    else if (!shown.length) status.textContent = 'Nothing matches \u201C' + query.trim() + '\u201D.';
+    else status.textContent = '';
+
+    shown.forEach((q) => wall.appendChild(cardEl(q)));
+    const f = wall.querySelector('[data-autofocus]');
+    if (f) f.focus();
+  }
+
+  function pickRandom() {
+    const pool = quotes.length > 1 ? quotes.filter((x) => x.id !== randomId) : quotes;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  function renderRandom() {
+    const has = ready && quotes.length > 0;
+    $('randomEmpty').hidden = has || !ready;
+    $('randomCard').hidden = !has;
+    $('randomActions').hidden = !has;
+    $('goAdd').hidden = readOnly;
+    $('randomEmptyMsg').textContent = readOnly
+      ? 'No quotes have been added yet. Check back soon.'
+      : 'Save a few quotes first, then come back here for a surprise.';
+    if (!has) { randomId = null; return; }
+    let q = quotes.find((x) => x.id === randomId);
+    if (!q) { q = pickRandom(); randomId = q.id; }
+    const c = colorOf(q);
+    const card = $('randomCard');
+    card.style.setProperty('--card-bg', c.bg);
+    card.style.setProperty('--card-fg', c.fg);
+    const t = $('randomText');
+    t.textContent = q.text;
+    t.className = q.text.length > 480 ? 'xlong' : q.text.length > 240 ? 'long' : '';
+    $('randomBook').textContent = q.book;
+    $('randomAuthor').textContent = q.author;
+    $('randomBook').hidden = !q.book;
+    $('randomAuthor').hidden = !q.author;
+  }
+
+  // ---- Tabs ----
+  const tabEls = [$('tab-fav'), $('tab-rand')];
+  const panels = [$('panel-fav'), $('panel-rand')];
+  function selectTab(i, focus) {
+    tabEls.forEach((t, j) => {
+      t.setAttribute('aria-selected', String(j === i));
+      t.tabIndex = j === i ? 0 : -1;
+      panels[j].hidden = j !== i;
+    });
+    if (focus) tabEls[i].focus();
+    if (i === 1) renderRandom();
+  }
+  tabEls.forEach((t, i) => {
+    t.addEventListener('click', () => selectTab(i));
+    t.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); selectTab(i === 0 ? 1 : 0, true); }
+    });
+  });
+  $('goAdd').addEventListener('click', () => { selectTab(0, true); $('qText').focus(); });
+
+  // ---- Random tab actions ----
+  $('nextBtn').addEventListener('click', () => {
+    if (!quotes.length) return;
+    randomId = pickRandom().id;
+    renderRandom();
+  });
+  $('randomCopy').addEventListener('click', () => {
+    const q = quotes.find((x) => x.id === randomId);
+    if (q) copyQuote(q);
+  });
+
+  // ---- Form ----
+  const form = $('addForm');
+  const qText = $('qText'), qBook = $('qBook'), qAuthor = $('qAuthor');
+
+  function formMsg(m) { $('formMsg').textContent = m || ''; }
+
+  function startEdit(q) {
+    if (!editingId) draft = { text: qText.value, book: qBook.value, author: qAuthor.value };
+    editingId = q.id;
+    qText.value = q.text; qBook.value = q.book; qAuthor.value = q.author;
+    formMsg('');
+    render();
+    form.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+    qText.focus();
+  }
+  function stopEdit() {
+    editingId = null;
+    if (draft) { qText.value = draft.text; qBook.value = draft.book; qAuthor.value = draft.author; draft = null; }
+    else { qText.value = ''; }
+    formMsg('');
+    render();
+  }
+  $('cancelEdit').addEventListener('click', () => { stopEdit(); qText.focus(); });
+
+  qBook.addEventListener('change', () => {
+    const b = qBook.value.trim().toLowerCase();
+    if (!b || qAuthor.value.trim()) return;
+    const match = quotes.find((q) => q.book.trim().toLowerCase() === b && q.author);
+    if (match) qAuthor.value = match.author;
+  });
+
+  qText.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); form.requestSubmit(); }
+    else if (e.key === 'Escape' && editingId) { stopEdit(); }
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (busy) return;
+    const text = qText.value.trim();
+    const book = qBook.value.trim();
+    const author = qAuthor.value.trim();
+    if (!text) { formMsg('Type or paste a quote first.'); qText.focus(); return; }
+    formMsg('');
+    busy = true;
+    $('submitBtn').disabled = true;
+    try {
+      if (editingId) {
+        await updateQuote(editingId, { text, book, author });
+        stopEdit();
+        toast('Changes saved');
+      } else {
+        const parts = $('qMulti').checked
+          ? text.split(/\n\s*\n/).map((s) => s.trim()).filter(Boolean)
+          : [text];
+        const base = Date.now();
+        let avoid = lastColor;
+        for (let i = 0; i < parts.length; i++) {
+          const color = pickColor(avoid);
+          avoid = color;
+          // Earlier quotes in a pasted batch stay above later ones in the list.
+          await addQuote({ text: parts[i], book, author, color, createdAt: base + (parts.length - 1 - i) });
+        }
+        lastColor = avoid;
+        qText.value = '';
+        render();
+        toast(parts.length > 1 ? plural(parts.length, 'quote') + ' added' : 'Quote added');
+      }
+    } catch (err) {
+      writeFailed(err);
+    } finally {
+      busy = false;
+      $('submitBtn').disabled = false;
+      qText.focus();
+    }
+  });
+
+  // ---- Search ----
+  $('search').addEventListener('input', (e) => { query = e.target.value; renderList(); });
+
+  // ---- Start-up ----
+  $('dlBtn').addEventListener('click', downloadQuotes);
+  $('resetBtn').addEventListener('click', () => {
+    if (!confirm('Discard the changes that are not on your site yet?')) return;
+    try { localStorage.removeItem(LS_KEY); } catch (e) {}
+    quotes = published.map((q) => Object.assign({}, q));
+    editingId = null;
+    render();
+    toast('Back to the quotes on your site');
+  });
+
+  function init() {
+    // quotes.js (loaded above) holds the quotes that visitors see.
+    const src = Array.isArray(window.QUOTES) ? window.QUOTES : [];
+    published = src.filter((q) => q && typeof q.text === 'string')
+      .map((q, i) => clean(Object.assign({}, q, { id: q.id || 'p' + i })));
+    readOnly = !isOwnerMode();
+    quotes = (!readOnly && loadDraft()) || published.map((q) => Object.assign({}, q));
+    ready = true;
+    render();
+  }
+
+  selectTab(0);
+  init();
+})();
+</script>
+</body>
+</html>
