@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<title>Quotes</title>
+<title>Quotes from my reading</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
@@ -80,7 +80,11 @@
   .count { margin: 0; color: var(--muted); font-size: .95rem; }
 
   /* Tabs */
-  .tabs { display: flex; gap: 1.75rem; margin: 1.25rem 0 1.5rem; border-bottom: 1px solid var(--line); }
+  .tabs {
+    display: flex; gap: 1.75rem; margin: 1.25rem 0 1.5rem; border-bottom: 1px solid var(--line);
+    overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
   .tab {
     appearance: none; background: none; border: 0; cursor: pointer;
     padding: .7rem 0; margin-bottom: -1px;
@@ -90,7 +94,7 @@
   .tab[aria-selected="true"] { color: var(--text); border-bottom-color: var(--text); font-weight: 600; }
   .tab:hover { color: var(--text); }
   .tab { white-space: nowrap; }
-  @media (max-width: 380px) { .tabs { gap: 1.1rem; } .tab { font-size: .92rem; } }
+  @media (max-width: 420px) { .tabs { gap: 1.1rem; } .tab { font-size: .9rem; } }
 
   /* Buttons */
   .btn {
@@ -143,6 +147,29 @@
   }
   .status { margin: 0; color: var(--muted); }
   .wall { column-width: 250px; column-gap: 1rem; }
+  .movie-wall { column-width: 280px; column-gap: 1rem; }
+  .movie-card {
+    display: block; position: relative; break-inside: avoid; margin: 0 0 1rem;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow: hidden;
+  }
+  .movie-card.editing { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .movie-pic-wrap { background: var(--field); line-height: 0; }
+  .movie-pic { display: block; width: 100%; height: auto; }
+  .movie-pic[hidden] { display: none; }
+  .movie-broken {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4rem;
+    padding: 2.25rem 1rem; color: var(--muted); font-size: .85rem; text-align: center; line-height: 1.4;
+  }
+  .movie-broken svg { width: 26px; height: 26px; stroke: currentColor; stroke-width: 1.6; fill: none; opacity: .7; }
+  .movie-body { padding: 1rem 1.1rem .7rem; }
+  .movie-quote {
+    margin: 0 0 .7rem; font: 400 italic 1.05rem/1.42 var(--serif); color: var(--text);
+    white-space: pre-line; overflow-wrap: anywhere; text-wrap: pretty;
+  }
+  .movie-quote:empty { display: none; }
+  .movie-foot { display: flex; align-items: center; justify-content: space-between; gap: .5rem; color: var(--muted); }
+  .movie-name { font: 600 .92rem var(--sans); color: var(--text); overflow-wrap: anywhere; min-width: 0; }
+  .movie-foot .tools { color: var(--muted); }
 
   .card {
     --card-bg: #1F3A93; --card-fg: #F3F5FF;
@@ -220,7 +247,7 @@
 <body>
 <div class="page">
   <header class="top">
-    <h1>Quotes</h1>
+    <h1>Quotes from my reading</h1>
     <p class="count" id="count"></p>
   </header>
 
@@ -228,13 +255,16 @@
     <p id="adminMsg"></p>
     <div class="admin-actions">
       <button type="button" class="btn primary" id="dlBtn">Download quotes.js</button>
-      <button type="button" class="btn ghost" id="resetBtn">Discard my changes</button>
+      <button type="button" class="btn ghost" id="resetBtn" hidden>Discard quote changes</button>
+      <button type="button" class="btn primary" id="dlMovieBtn">Download movies.js</button>
+      <button type="button" class="btn ghost" id="resetMovieBtn" hidden>Discard movie changes</button>
     </div>
   </div>
 
   <div class="tabs" role="tablist" aria-label="Sections">
     <button class="tab" role="tab" id="tab-fav" aria-selected="true" aria-controls="panel-fav">Favourite quotes</button>
     <button class="tab" role="tab" id="tab-rand" aria-selected="false" aria-controls="panel-rand" tabindex="-1">Random quote</button>
+    <button class="tab" role="tab" id="tab-movies" aria-selected="false" aria-controls="panel-movies" tabindex="-1">Movie quotes</button>
   </div>
 
   <!-- Section 1: Favourite quotes -->
@@ -290,11 +320,46 @@
       <button type="button" class="btn ghost" id="randomCopy">Copy</button>
     </div>
   </section>
+
+  <!-- Section 3: Movie quotes -->
+  <section id="panel-movies" role="tabpanel" aria-labelledby="tab-movies" hidden>
+    <form id="movieForm" class="composer" autocomplete="off">
+      <h2 id="movieFormTitle">Add a movie quote</h2>
+      <div class="field">
+        <label for="mPic">Image link</label>
+        <input id="mPic" type="url" maxlength="2000" placeholder="https://… link to the scene image">
+      </div>
+      <div class="field" style="margin-top:.75rem">
+        <label for="mQuote">Quote</label>
+        <textarea id="mQuote" maxlength="1000" placeholder="What's said in the scene"></textarea>
+      </div>
+      <div class="fields">
+        <div class="field">
+          <label for="mMovie">Movie name</label>
+          <input id="mMovie" type="text" maxlength="200" list="movieList" placeholder="Movie title">
+          <datalist id="movieList"></datalist>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="submit" class="btn primary" id="movieSubmitBtn">Add movie quote</button>
+        <button type="button" class="btn ghost" id="movieCancelEdit" hidden>Cancel</button>
+        <span class="hint">Paste a direct image link (ending in .jpg, .png, .webp…) from any site that allows hotlinking.</span>
+        <p class="form-msg" id="movieFormMsg" role="alert"></p>
+      </div>
+    </form>
+
+    <div class="wall-head">
+      <input class="search" id="movieSearch" type="search" placeholder="Search by quote or movie" aria-label="Search movie quotes" hidden>
+      <p class="status" id="movieListStatus"></p>
+    </div>
+    <div class="movie-wall" id="movieWall"></div>
+  </section>
 </div>
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script src="quotes.js"></script>
+<script src="movies.js"></script>
 <script>
 (function () {
   'use strict';
@@ -318,11 +383,13 @@
     copy: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>',
     color: '<path d="M20 11a8 8 0 0 0-14.9-3M4 5v3h3"/><path d="M4 13a8 8 0 0 0 14.9 3M20 19v-3h-3"/>',
     edit: '<path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/>',
-    trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/>'
+    trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/>',
+    photo: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M4 17l5-5 4 4 3-3 4 4"/>'
   };
 
   const $ = (id) => document.getElementById(id);
   const LS_KEY = 'book-quotes-owner-v1';
+  const MOVIE_LS_KEY = 'book-quotes-movies-owner-v1';
   const ADMIN_KEY = 'book-quotes-owner-mode';
   const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -340,6 +407,16 @@
   let lastColor = -1;
   let busy = false;
   let toastTimer = null;
+
+  // Movie quotes: {id, pic, quote, movie, createdAt}
+  let movies = [];
+  let publishedMovies = [];   // what movies.js on the site currently contains
+  let movieEditingId = null;
+  let movieDraft = null;
+  let movieConfirmId = null;
+  let movieConfirmTimer = null;
+  let movieQuery = '';
+  let movieBusy = false;
 
   // ---- Small helpers ----
   const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
@@ -364,6 +441,15 @@
       author: String(q.author || ''),
       color: q.color,
       createdAt: Number(q.createdAt) || 0
+    };
+  }
+  function cleanMovie(m) {
+    return {
+      id: m.id,
+      pic: String(m.pic || ''),
+      quote: String(m.quote || ''),
+      movie: String(m.movie || ''),
+      createdAt: Number(m.createdAt) || 0
     };
   }
   function toast(msg) {
@@ -405,6 +491,11 @@
       .map((q) => [q.id, q.text, q.book, q.author, q.color, q.createdAt])
   );
   const isDirty = () => normalize(quotes) !== normalize(published);
+  const normalizeMovies = (arr) => JSON.stringify(
+    arr.slice().sort((x, y) => (x.id < y.id ? -1 : x.id > y.id ? 1 : 0))
+      .map((m) => [m.id, m.pic, m.quote, m.movie, m.createdAt])
+  );
+  const isMovieDirty = () => normalizeMovies(movies) !== normalizeMovies(publishedMovies);
   function loadDraft() {
     try {
       const raw = localStorage.getItem(LS_KEY);
@@ -416,6 +507,17 @@
     try { localStorage.setItem(LS_KEY, JSON.stringify(quotes)); }
     catch (e) { throw new Error('storage'); }
   }
+  function loadMovieDraft() {
+    try {
+      const raw = localStorage.getItem(MOVIE_LS_KEY);
+      const arr = raw ? JSON.parse(raw) : null;
+      return Array.isArray(arr) ? arr.filter((m) => m && typeof m.pic === 'string' && m.id).map(cleanMovie) : null;
+    } catch (e) { return null; }
+  }
+  function saveMovieDraft() {
+    try { localStorage.setItem(MOVIE_LS_KEY, JSON.stringify(movies)); }
+    catch (e) { throw new Error('storage'); }
+  }
 
   // ---- Storage actions (they change the owner's copy in this browser) ----
   async function addQuote(data) { quotes.push(Object.assign({ id: uid() }, data)); saveDraft(); }
@@ -425,6 +527,13 @@
     saveDraft();
   }
   async function deleteQuote(id) { quotes = quotes.filter((x) => x.id !== id); saveDraft(); }
+  async function addMovie(data) { movies.push(Object.assign({ id: uid() }, data)); saveMovieDraft(); }
+  async function updateMovie(id, patch) {
+    const m = movies.find((x) => x.id === id);
+    if (m) Object.assign(m, patch);
+    saveMovieDraft();
+  }
+  async function deleteMovie(id) { movies = movies.filter((x) => x.id !== id); saveMovieDraft(); }
   function writeFailed() { toast('Couldn\u2019t save in this browser. Check that storage isn\u2019t blocked.'); }
 
   function downloadQuotes() {
@@ -438,6 +547,17 @@
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     toast('Downloaded. Replace quotes.js in your project, then redeploy.');
   }
+  function downloadMovies() {
+    const data = movies.slice().sort((x, y) => y.createdAt - x.createdAt)
+      .map((m) => ({ id: m.id, pic: m.pic, quote: m.quote, movie: m.movie, createdAt: m.createdAt }));
+    const body = 'window.MOVIES = ' + JSON.stringify(data, null, 2) + ';\n';
+    const url = URL.createObjectURL(new Blob([body], { type: 'text/javascript' }));
+    const a = document.createElement('a');
+    a.href = url; a.download = 'movies.js';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast('Downloaded. Replace movies.js in your project, then redeploy.');
+  }
 
   // ---- Rendering ----
   function render() {
@@ -446,6 +566,9 @@
     renderFormState();
     renderList();
     renderRandom();
+    renderMovieFormState();
+    renderMovieBooks();
+    renderMovieList();
   }
 
   function renderCount() {
@@ -485,11 +608,15 @@
     bar.hidden = readOnly;
     if (readOnly) return;
     const dirty = isDirty();
-    $('adminMsg').textContent = dirty
-      ? 'Owner mode. You have changes that aren\u2019t on your site yet. Download quotes.js, replace it in your project and redeploy.'
-      : 'Owner mode. Your site shows all of your quotes.';
+    const movieDirty = isMovieDirty();
+    if (dirty && movieDirty) $('adminMsg').textContent = 'Owner mode. You have quote and movie-quote changes that aren\u2019t on your site yet. Download each file below, replace it in your project and redeploy.';
+    else if (dirty) $('adminMsg').textContent = 'Owner mode. You have quote changes that aren\u2019t on your site yet. Download quotes.js, replace it in your project and redeploy.';
+    else if (movieDirty) $('adminMsg').textContent = 'Owner mode. You have movie-quote changes that aren\u2019t on your site yet. Download movies.js, replace it in your project and redeploy.';
+    else $('adminMsg').textContent = 'Owner mode. Your site shows everything you\u2019ve added.';
     $('dlBtn').className = 'btn ' + (dirty ? 'primary' : 'ghost');
     $('resetBtn').hidden = !dirty;
+    $('dlMovieBtn').className = 'btn ' + (movieDirty ? 'primary' : 'ghost');
+    $('resetMovieBtn').hidden = !movieDirty;
   }
 
   function iconBtn(name, label, onClick) {
@@ -583,6 +710,123 @@
     if (f) f.focus();
   }
 
+  // ---- Movie quotes: rendering ----
+  function renderMovieFormState() {
+    const editing = !!movieEditingId;
+    $('movieForm').hidden = readOnly;
+    $('movieFormTitle').textContent = editing ? 'Edit movie quote' : 'Add a movie quote';
+    $('movieSubmitBtn').textContent = editing ? 'Save changes' : 'Add movie quote';
+    $('movieCancelEdit').hidden = !editing;
+  }
+
+  function movieCardEl(m) {
+    const el = document.createElement('article');
+    el.className = 'movie-card' + (m.id === movieEditingId ? ' editing' : '');
+
+    const picWrap = document.createElement('div');
+    picWrap.className = 'movie-pic-wrap';
+    const img = document.createElement('img');
+    img.className = 'movie-pic';
+    img.src = m.pic;
+    img.alt = m.movie ? ('Scene from ' + m.movie) : 'Movie scene';
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    img.referrerPolicy = 'no-referrer';
+    img.addEventListener('error', () => {
+      img.hidden = true;
+      const broken = document.createElement('div');
+      broken.className = 'movie-broken';
+      broken.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS.photo + '</svg><span>Image unavailable</span>';
+      picWrap.appendChild(broken);
+    }, { once: true });
+    picWrap.appendChild(img);
+    el.appendChild(picWrap);
+
+    const body = document.createElement('div');
+    body.className = 'movie-body';
+    const quote = document.createElement('blockquote');
+    quote.className = 'movie-quote';
+    quote.textContent = m.quote;
+    body.appendChild(quote);
+
+    const foot = document.createElement('footer');
+    foot.className = 'movie-foot';
+    const name = document.createElement('cite');
+    name.className = 'movie-name';
+    name.textContent = m.movie;
+    foot.appendChild(name);
+
+    const tools = document.createElement('div');
+    tools.className = 'tools';
+    if (!readOnly) {
+      tools.appendChild(iconBtn('edit', 'Edit movie quote', () => startMovieEdit(m)));
+      if (movieConfirmId === m.id) {
+        const y = document.createElement('button');
+        y.type = 'button';
+        y.className = 'confirm';
+        y.textContent = 'Delete?';
+        y.setAttribute('data-autofocus', '1');
+        y.addEventListener('click', async () => {
+          clearTimeout(movieConfirmTimer); movieConfirmId = null;
+          try {
+            if (movieEditingId === m.id) stopMovieEdit();
+            await deleteMovie(m.id);
+            render();
+            toast('Movie quote deleted');
+          } catch (e) { writeFailed(e); }
+        });
+        tools.appendChild(y);
+      } else {
+        tools.appendChild(iconBtn('trash', 'Delete movie quote', () => {
+          movieConfirmId = m.id;
+          clearTimeout(movieConfirmTimer);
+          movieConfirmTimer = setTimeout(() => { movieConfirmId = null; renderMovieList(); }, 3500);
+          renderMovieList();
+        }));
+      }
+    }
+    foot.appendChild(tools);
+    body.appendChild(foot);
+    el.appendChild(body);
+    return el;
+  }
+
+  function renderMovieList() {
+    const wall = $('movieWall');
+    const status = $('movieListStatus');
+    wall.textContent = '';
+    $('movieSearch').hidden = !ready || !movies.length;
+
+    const s2 = movieQuery.trim().toLowerCase();
+    const sorted = movies.slice().sort((a, b) => b.createdAt - a.createdAt);
+    const shown = s2
+      ? sorted.filter((m) => (m.quote + ' ' + m.movie).toLowerCase().includes(s2))
+      : sorted;
+
+    if (!movies.length) status.textContent = readOnly ? 'No movie quotes have been added yet.' : 'No movie quotes yet. Add your first one above.';
+    else if (!shown.length) status.textContent = 'Nothing matches \u201C' + movieQuery.trim() + '\u201D.';
+    else status.textContent = '';
+
+    shown.forEach((m) => wall.appendChild(movieCardEl(m)));
+    const f = wall.querySelector('[data-autofocus]');
+    if (f) f.focus();
+  }
+
+  function renderMovieBooks() {
+    const dl = $('movieList');
+    dl.textContent = '';
+    const seen = new Map();
+    movies.forEach((m) => {
+      const v = m.movie.trim();
+      if (v && !seen.has(v.toLowerCase())) seen.set(v.toLowerCase(), v);
+    });
+    Array.from(seen.values()).sort((a, b) => a.localeCompare(b)).forEach((v) => {
+      const o = document.createElement('option');
+      o.value = v;
+      dl.appendChild(o);
+    });
+  }
+
   function pickRandom() {
     const pool = quotes.length > 1 ? quotes.filter((x) => x.id !== randomId) : quotes;
     return pool[Math.floor(Math.random() * pool.length)];
@@ -614,8 +858,8 @@
   }
 
   // ---- Tabs ----
-  const tabEls = [$('tab-fav'), $('tab-rand')];
-  const panels = [$('panel-fav'), $('panel-rand')];
+  const tabEls = [$('tab-fav'), $('tab-rand'), $('tab-movies')];
+  const panels = [$('panel-fav'), $('panel-rand'), $('panel-movies')];
   function selectTab(i, focus) {
     tabEls.forEach((t, j) => {
       t.setAttribute('aria-selected', String(j === i));
@@ -624,11 +868,15 @@
     });
     if (focus) tabEls[i].focus();
     if (i === 1) renderRandom();
+    if (i === 2) renderMovieList();
   }
   tabEls.forEach((t, i) => {
     t.addEventListener('click', () => selectTab(i));
     t.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); selectTab(i === 0 ? 1 : 0, true); }
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        selectTab(e.key === 'ArrowRight' ? (i + 1) % tabEls.length : (i - 1 + tabEls.length) % tabEls.length, true);
+      }
     });
   });
   $('goAdd').addEventListener('click', () => { selectTab(0, true); $('qText').focus(); });
@@ -721,27 +969,104 @@
     }
   });
 
+  // ---- Movie quote form ----
+  const movieForm = $('movieForm');
+  const mPic = $('mPic'), mQuote = $('mQuote'), mMovie = $('mMovie');
+
+  function movieFormMsg(m) { $('movieFormMsg').textContent = m || ''; }
+
+  function startMovieEdit(m) {
+    if (!movieEditingId) movieDraft = { pic: mPic.value, quote: mQuote.value, movie: mMovie.value };
+    movieEditingId = m.id;
+    mPic.value = m.pic; mQuote.value = m.quote; mMovie.value = m.movie;
+    movieFormMsg('');
+    render();
+    movieForm.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+    mPic.focus();
+  }
+  function stopMovieEdit() {
+    movieEditingId = null;
+    if (movieDraft) { mPic.value = movieDraft.pic; mQuote.value = movieDraft.quote; mMovie.value = movieDraft.movie; movieDraft = null; }
+    else { mPic.value = ''; mQuote.value = ''; mMovie.value = ''; }
+    movieFormMsg('');
+    render();
+  }
+  $('movieCancelEdit').addEventListener('click', () => { stopMovieEdit(); mPic.focus(); });
+
+  mQuote.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); movieForm.requestSubmit(); }
+    else if (e.key === 'Escape' && movieEditingId) { stopMovieEdit(); }
+  });
+
+  movieForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (movieBusy) return;
+    const pic = mPic.value.trim();
+    const quoteText = mQuote.value.trim();
+    const movieName = mMovie.value.trim();
+    if (!pic) { movieFormMsg('Paste an image link first.'); mPic.focus(); return; }
+    let okUrl = true;
+    try { new URL(pic); } catch (e) { okUrl = false; }
+    if (!okUrl) { movieFormMsg('That doesn\u2019t look like a full link. Include https://'); mPic.focus(); return; }
+    movieFormMsg('');
+    movieBusy = true;
+    $('movieSubmitBtn').disabled = true;
+    try {
+      if (movieEditingId) {
+        await updateMovie(movieEditingId, { pic, quote: quoteText, movie: movieName });
+        stopMovieEdit();
+        toast('Changes saved');
+      } else {
+        await addMovie({ pic, quote: quoteText, movie: movieName, createdAt: Date.now() });
+        mPic.value = ''; mQuote.value = ''; mMovie.value = '';
+        render();
+        toast('Movie quote added');
+      }
+    } catch (err) {
+      writeFailed(err);
+    } finally {
+      movieBusy = false;
+      $('movieSubmitBtn').disabled = false;
+      mPic.focus();
+    }
+  });
+
+  $('movieSearch').addEventListener('input', (e) => { movieQuery = e.target.value; renderMovieList(); });
+
   // ---- Search ----
   $('search').addEventListener('input', (e) => { query = e.target.value; renderList(); });
 
   // ---- Start-up ----
   $('dlBtn').addEventListener('click', downloadQuotes);
   $('resetBtn').addEventListener('click', () => {
-    if (!confirm('Discard the changes that are not on your site yet?')) return;
+    if (!confirm('Discard the quote changes that are not on your site yet?')) return;
     try { localStorage.removeItem(LS_KEY); } catch (e) {}
     quotes = published.map((q) => Object.assign({}, q));
     editingId = null;
     render();
     toast('Back to the quotes on your site');
   });
+  $('dlMovieBtn').addEventListener('click', downloadMovies);
+  $('resetMovieBtn').addEventListener('click', () => {
+    if (!confirm('Discard the movie-quote changes that are not on your site yet?')) return;
+    try { localStorage.removeItem(MOVIE_LS_KEY); } catch (e) {}
+    movies = publishedMovies.map((m) => Object.assign({}, m));
+    movieEditingId = null;
+    render();
+    toast('Back to the movie quotes on your site');
+  });
 
   function init() {
-    // quotes.js (loaded above) holds the quotes that visitors see.
+    // quotes.js and movies.js (loaded above) hold what visitors see.
     const src = Array.isArray(window.QUOTES) ? window.QUOTES : [];
     published = src.filter((q) => q && typeof q.text === 'string')
       .map((q, i) => clean(Object.assign({}, q, { id: q.id || 'p' + i })));
+    const msrc = Array.isArray(window.MOVIES) ? window.MOVIES : [];
+    publishedMovies = msrc.filter((m) => m && typeof m.pic === 'string')
+      .map((m, i) => cleanMovie(Object.assign({}, m, { id: m.id || 'pm' + i })));
     readOnly = !isOwnerMode();
     quotes = (!readOnly && loadDraft()) || published.map((q) => Object.assign({}, q));
+    movies = (!readOnly && loadMovieDraft()) || publishedMovies.map((m) => Object.assign({}, m));
     ready = true;
     render();
   }
